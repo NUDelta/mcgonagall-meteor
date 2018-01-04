@@ -1,25 +1,22 @@
-# RPPT Web Control Center
-Authored by [Kevin Chen](http://kevinchen.ninja), 2015.
+# McGonagall Meteor app & Wizard Control Center
+Meteor app component of the [McGonagall](https://github.com/NUDelta/mcgonagall) project. See that README for instructions as how to setup the entire architecture.
 
-Master repository located at [remote-paper-prototype-testing](https://github.com/NUDelta/remote-paper-prototype-testing). See that README for more extensive physical setup information.
+This project includes the client code responsible for the Wizard Control Center, image analysis for native and multi-fidelity elements detection, and server code to talk to the [McGonagall iOS component](https://github.com/NUDelta/mcgonagall-ios).
 
-## Requirements/Setup
-We recommend getting an [OpenTok](https://tokbox.com/developer/) account to run this application. Sign up (you'll get a 30 day free trial), create a project, and enter your API and secret keys into the `server/lib/environment.js` file. You should currently be able to use the one we have left there or at `rppt.meteor.com`, but we may not support that into the future.
+## Requirements
+Must connect to `rppt.meteor.com` using Firefox.
 
 ## Usage
-This application separates information out into three distinct columns.
+The Wizard Control Center presents information to wizards in three distinct columns during prototyping testing sessions.
 
-The left column contains primarily administrative controls. You can set the main task that the user tester is supposed to do (updated with a sound effect on the iOS application), sync the iOS application with the sync code and the Google Glass application with the QR code.
+The left column includes the stream key to connect to the McGonagall iOS app, button to detect and react to native and multi-fidelity elements in the stream, and full camera stream feed (to make sure TopCodes are within bounds).
 
-The middle column displays contextual information about the user tester -- the first person perspective comes from the camera on Google Glass, and the location from the iOS application.
+The middle column displays a stream of the user's iOS app interface.
 
-The right column shows the paper prototype (streamed to the iOS application), and overlays all gestures and actions from the user tester.
-
-## Customization
-Do feel free to customize this web application as needed for your own purposes. You'll need [Meteor](http://meteor.com) to do so.
-
-## Issues
-Feel free to report bugs or anything unclear :)
+The right column allows you to send a task for the user to render on the iOS app, shows any messages sent by the user on the native keyboard (after pressing enter), and displays the users location.
 
 ## Contact
-[kevinchen2016@u.northwestern.edu](mailto:kevinchen2016@u.northwestern.edu)
+Feel free to reach out with issues or questions!
+
+Meg Grasse at [meggrasse@u.northwestern.edu](mailto:meggrasse@u.northwestern.edu)  
+Andrew Finke
