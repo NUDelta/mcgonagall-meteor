@@ -33,6 +33,19 @@ var states = {
   mapOverlay: false, 
 }
 
+// buffer for each element 
+// once a topcode was visible or not visible for 3 subsequent frames we can call the server method
+var buffer = {
+  keyboard : 0,
+  camera : 0,
+  photo : 0,
+  map : 0, 
+  keyboardOverlay : 0,
+  cameraOverlay : 0,
+  photoOverlay : 0,
+  mapOverlay: 0, 
+}
+
 Template.cc.rendered = function videoSetup() {
   document.querySelector("#camera-button").onclick = function(){ TopCodes.startStopVideoScan('video-canvas'); };
   // TODO: change button color based on state
@@ -74,17 +87,25 @@ function parseCodes(codeDict) {
   //  - add a listener for changes in topcodes rather than blocking main thread
 
   // find codes we care about
-  if (codes['keyboard'] in codeDict && 
-      !states['keyboard']) {
+  console.log(buffer['keyboard']);
+  if (codes['keyboard'] in codeDict) {
 
-    Meteor.call('showKeyboard', session);
-    states['keyboard'] = true;
+    buffer['keyboard'] = 0;
+    if (!states['keyboard']) {
+      Meteor.call('showKeyboard', session);
+      states['keyboard'] = true;
+    }
 
   } else if (!(codes['keyboard'] in codeDict) && 
       states['keyboard']) {
 
-    Meteor.call('hideKeyboard', session);
-    states['keyboard'] = false;
+    if (buffer['keyboard'] == 5) {
+      Meteor.call('hideKeyboard', session);
+      states['keyboard'] = false;
+      buffer['keyboard'] = 0;
+    } else {
+      buffer['keyboard']++;
+    }
 
   }
 

@@ -126,6 +126,7 @@ Meteor.methods({
     },
 
     hideKeyboard: function(session) {
+        console.log("Calling `hideKeyboard`");
         Messages.update({ session: session }, { $set: { keyboard: 'hide' } });
     },
 
