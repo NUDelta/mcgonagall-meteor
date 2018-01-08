@@ -1,6 +1,6 @@
 // ideally these would be auto-detected, but for now we'll hardcode
-const VIDEO_WIDTH = 1280; //1920;
-const VIDEO_HEIGHT = 720; //1080;
+const VIDEO_WIDTH = 640; //1920;
+const VIDEO_HEIGHT = 480; //1080;
 
 const IOS_WIDTH = 375;
 // with UINavBar and UIStatusBar
@@ -8,6 +8,9 @@ const IOS_FULL_HEIGHT = 667;
 // without
 const IOS_VIEW_HEIGHT = 603;
 const IOS_TOP_PADDING = 64;
+
+// The amount of frames without the topcode needed for the digital element to hide  
+const FRAME_BUFFER = 5;
 
 // topcodes corresponding to different elements
 // arrays correspond to [top left, top right, bottom left, bottom right]
@@ -87,9 +90,9 @@ function parseCodes(codeDict) {
   //  - add a listener for changes in topcodes rather than blocking main thread
 
   // find codes we care about
-  console.log(buffer['keyboard']);
   if (codes['keyboard'] in codeDict) {
 
+    // if we see the topcode in the camera stream at all wipe the buffer
     buffer['keyboard'] = 0;
     if (!states['keyboard']) {
       Meteor.call('showKeyboard', session);
@@ -99,7 +102,7 @@ function parseCodes(codeDict) {
   } else if (!(codes['keyboard'] in codeDict) && 
       states['keyboard']) {
 
-    if (buffer['keyboard'] == 5) {
+    if (buffer['keyboard'] == FRAME_BUFFER) {
       Meteor.call('hideKeyboard', session);
       states['keyboard'] = false;
       buffer['keyboard'] = 0;
@@ -111,8 +114,8 @@ function parseCodes(codeDict) {
 
   if (codes['camera'] in codeDict) {
 
-    console.log("in camera")
-
+    // if we see the topcode in the camera stream at all wipe the buffer
+    buffer['camera'] = 0;
     if (!states['camera']) {
       Meteor.call('showCamera', session);
       states['camera'] = true;
@@ -131,8 +134,13 @@ function parseCodes(codeDict) {
   } else if (!(codes['camera'] in codeDict) && 
       states['camera']) {
 
-    Meteor.call('hideCamera', session);
-    states['camera'] = false;
+    if (buffer['camera'] == FRAME_BUFFER) {
+      Meteor.call('hideCamera', session);
+      states['camera'] = false;
+      buffer['camera'] = 0;
+    } else {
+      buffer['camera']++;
+    }
 
   }
 
@@ -151,6 +159,8 @@ function parseCodes(codeDict) {
     var iOSCoordinates = transformCoordinates([x, y, width, height]);
 
     if (iOSCoordinates) {
+      // only wipe the buffer if all the topcodes are within bounds
+      buffer['photo'] = 0;
       // TODO: fix order in server call
       Meteor.call('photo', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[3], iOSCoordinates[2]);
       states['photo'] = true;
@@ -181,8 +191,15 @@ function parseCodes(codeDict) {
       codes['photo'][2] in codeDict ||
       codes['photo'][3] in codeDict) &&
       states['photo']) {
-    Meteor.call('photo', session, -999, -999, -999, -999);
-    states['photo'] = false;
+
+    if (buffer['photo'] == FRAME_BUFFER) {
+      Meteor.call('photo', session, -999, -999, -999, -999);
+      states['photo'] = false;
+      buffer['photo'] = 0;
+    } else {
+      buffer['photo']++;
+    }
+
   }
 
   if ((codes['map'][0] in codeDict &&
@@ -200,6 +217,8 @@ function parseCodes(codeDict) {
     var iOSCoordinates = transformCoordinates([x, y, width, height]);  
 
     if (iOSCoordinates) {
+      // only wipe the buffer if all the topcodes are within bounds
+      buffer['map'] = 0;
       // TODO: fix order in server call
       Meteor.call('map', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[3], iOSCoordinates[2]);
       states['map'] = true;
@@ -229,8 +248,15 @@ function parseCodes(codeDict) {
       codes['map'][2] in codeDict ||
       codes['map'][3] in codeDict) &&
       states['map']) {
-    Meteor.call('map', session, -999, -999, -999, -999);
-    states['map'] = false;
+
+    if (buffer['map'] == FRAME_BUFFER) {
+      Meteor.call('map', session, -999, -999, -999, -999);
+      states['map'] = false;
+      buffer['map'] = 0;
+    } else {
+      buffer['map']++;
+    }
+
   }
 
   // remove overlays w/o appr code regardless if native elements are on screen

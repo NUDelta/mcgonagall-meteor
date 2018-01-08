@@ -9,7 +9,7 @@ Template.paperStream.rendered = function () {
         // make publisher element on cc same dimensions as camera stream
         var properties = {
           width : 256,
-          height : 144
+          height : 192
         };
         publisher = OT.initPublisher('publisher', properties);
         stream.publish(publisher);
