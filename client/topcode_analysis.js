@@ -122,7 +122,7 @@ function parseCodes(codeDict) {
     }
 
     if (codes['cameraOverlay'] in codeDict) {
-      console.log("overlay")
+      buffer['cameraOverlay'] = 0;
       var screenshotWidth = (VIDEO_HEIGHT / IOS_FULL_HEIGHT) * IOS_WIDTH;
       var screenshotX = (VIDEO_WIDTH - screenshotWidth) / 2;
 
@@ -149,6 +149,7 @@ function parseCodes(codeDict) {
       codes['photo'][2] in codeDict &&
       codes['photo'][3] in codeDict)) {
 
+    buffer['photo'] = 0;
     // TODO: add in algorithm to include bottom right code & make shape more stable
     // publisher is mirrored
     var x = codeDict[codes['photo'][0]].x + codeDict[codes['photo'][0]].radius;
@@ -159,14 +160,13 @@ function parseCodes(codeDict) {
     var iOSCoordinates = transformCoordinates([x, y, width, height]);
 
     if (iOSCoordinates) {
-      // only wipe the buffer if all the topcodes are within bounds
-      buffer['photo'] = 0;
       // TODO: fix order in server call
       Meteor.call('photo', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[3], iOSCoordinates[2]);
       states['photo'] = true;
     }
 
     if (codes['photoOverlay'] in codeDict) {
+      buffer['photoOverlay'] = 0;
       // Topcodes are detected in the mirrored publisher stream
       var screenshotX = codeDict[codes['photo'][0]].x - codeDict[codes['photo'][0]].radius;
       var screenshotY = codeDict[codes['photo'][0]].y + codeDict[codes['photo'][0]].radius;
@@ -207,6 +207,7 @@ function parseCodes(codeDict) {
       codes['map'][2] in codeDict &&
       codes['map'][3] in codeDict)) {
 
+    buffer['map'] = 0;
     // TODO: add in algorithm to include bottom right code & make shape more stable
     // publisher is mirrored
     var x = codeDict[codes['map'][0]].x + codeDict[codes['map'][0]].radius;
@@ -217,14 +218,13 @@ function parseCodes(codeDict) {
     var iOSCoordinates = transformCoordinates([x, y, width, height]);  
 
     if (iOSCoordinates) {
-      // only wipe the buffer if all the topcodes are within bounds
-      buffer['map'] = 0;
       // TODO: fix order in server call
       Meteor.call('map', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[3], iOSCoordinates[2]);
       states['map'] = true;
     }
 
     if (codes['mapOverlay'] in codeDict) {
+      buffer['mapOverlay'] = 0;
       // Topcodes are detected in the mirrored publisher stream
       var screenshotX = codeDict[codes['map'][0]].x - codeDict[codes['map'][0]].radius;
       var screenshotY = codeDict[codes['map'][0]].y + codeDict[codes['map'][0]].radius;
@@ -262,23 +262,42 @@ function parseCodes(codeDict) {
   // remove overlays w/o appr code regardless if native elements are on screen
   if (!(codes['mapOverlay'] in codeDict) && 
       states['mapOverlay']) {
-    Meteor.call('sendOverlay', session, -999, -999, -999, -999, "", "false");
-    states['mapOverlay'] = false;
+
+    if (buffer['mapOverlay'] == FRAME_BUFFER) {
+      Meteor.call('sendOverlay', session, -999, -999, -999, -999, "", "false");
+      states['mapOverlay'] = false;
+      buffer['mapOverlay'] = 0;
+    } else {
+      buffer['mapOverlay']++;
+    }
+
   }
 
   if (!(codes['photoOverlay'] in codeDict) && 
       states['photoOverlay']) {
-    Meteor.call('sendOverlay', session, -999, -999, -999, -999, "", "false");
-    states['photoOverlay'] = false;
+
+    if (buffer['photoOverlay'] == FRAME_BUFFER) {
+      Meteor.call('sendOverlay', session, -999, -999, -999, -999, "", "false");
+      states['photoOverlay'] = false;
+      buffer['photoOverlay'] = 0;
+    } else {
+      buffer['photoOverlay']++;
+    }
+
   }
 
   if (!(codes['cameraOverlay'] in codeDict) && 
       states['cameraOverlay']) {
-    console.log("hiding overlay")
-    Meteor.call('sendOverlay', session, -999, -999, -999, -999, "", "true");
-    states['cameraOverlay'] = false;
-  }
 
+    if (buffer['cameraOverlay'] == FRAME_BUFFER) {
+      Meteor.call('sendOverlay', session, -999, -999, -999, -999, "", "true");
+      states['cameraOverlay'] = false;
+      buffer['cameraOverlay'] = 0;
+    } else {
+      buffer['cameraOverlay']++;
+    }
+
+  }
 }
 
 // send top left x and y in web stream, height, and width
