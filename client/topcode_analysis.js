@@ -85,9 +85,7 @@ TopCodes.setVideoFrameCallback("video-canvas", function(jsonString) {
 
 function parseCodes(codeDict) {
 
-  // TODO: 
-  //  - add in screenshots
-  //  - add a listener for changes in topcodes rather than blocking main thread
+  // TODO: add a listener for changes in topcodes rather than constantly sending server calls
 
   // find codes we care about
   if (codes['keyboard'] in codeDict) {
@@ -160,8 +158,7 @@ function parseCodes(codeDict) {
     var iOSCoordinates = transformCoordinates([x, y, width, height]);
 
     if (iOSCoordinates) {
-      // TODO: fix order in server call
-      Meteor.call('photo', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[3], iOSCoordinates[2]);
+      Meteor.call('photo', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[2], iOSCoordinates[3]);
       states['photo'] = true;
     }
 
@@ -218,8 +215,7 @@ function parseCodes(codeDict) {
     var iOSCoordinates = transformCoordinates([x, y, width, height]);  
 
     if (iOSCoordinates) {
-      // TODO: fix order in server call
-      Meteor.call('map', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[3], iOSCoordinates[2]);
+      Meteor.call('map', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[2], iOSCoordinates[3]);
       states['map'] = true;
     }
 
@@ -302,7 +298,7 @@ function parseCodes(codeDict) {
 
 // send top left x and y in web stream, height, and width
 function transformCoordinates(coordinates) {
-  // publisher stream dimensions: [0, 0, 1280, 720]
+  // publisher stream dimensions: [0, 0, 640, 480]
   // iOS subscriber stream dimensions: [0, 64, 375, 603]
 
   // the stream size adjusts to the height of the iOS client
