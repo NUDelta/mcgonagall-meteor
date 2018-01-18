@@ -70,7 +70,7 @@ Meteor.methods({
     },
 
     // mixed fidelity element control
-    keyboard: function(session, x, y, height, width) {
+    keyboard: function(session, x, y, width, height) {
         console.log('keyboard called in methods.js');
         Messages.update({ session: session }, { $set: { keyboard_x: x,
                                                         keyboard_y: y,
@@ -78,7 +78,7 @@ Meteor.methods({
                                                         keyboard_width: width } });
     },
 
-    photo: function(session, x, y, height, width) {
+    photo: function(session, x, y, width, height) {
         console.log('called photo in methods.js');
         x = String(x);
         y = String(y);
@@ -91,7 +91,7 @@ Meteor.methods({
                                                         photo_width: width} });
     },
 
-    map: function(session, x, y, height, width) {
+    map: function(session, x, y, width, height) {
         x = String(x);
         y = String(y);
         height = String(height);
@@ -121,10 +121,12 @@ Meteor.methods({
     },
 
     showKeyboard: function(session) {
+        console.log("Calling `showKeyboard`");
         Messages.update({ session: session }, { $set: { keyboard: 'show'} });
     },
 
     hideKeyboard: function(session) {
+        console.log("Calling `hideKeyboard`");
         Messages.update({ session: session }, { $set: { keyboard: 'hide' } });
     },
 
@@ -140,10 +142,6 @@ Meteor.methods({
       console.log("sending overlay");
       Messages.update({ session: session }, { $set: data });
     },
-
-    sendFullOverlay: function(session, image) {
-        Messages.update({ session: session }, { $set: { overlayedFullImage: image } });
-    }
 
 });
 
