@@ -1,45 +1,42 @@
 <template name="cc">
-  <nav>
-    <div class="nav-wrapper light-blue darken-2">
-      <a href="#" class="brand-logo center">MF-RPPT Control Center</a>
-    </div>
-  </nav>
+  <div id="nav">
+  <div id="title-text">McGonagall Command Center</div>
 
-  <div class="row full-height">
-    <div class="col l3 center center-vertical full-height">
-      <div class="content padding">
-        <div id="stream-key">
-          <h5>
-            Stream Key: <span class="amber-text text-darken-4">{{ sessionKey }}</span>
-          </h5>
-        </div>
-        <button id="camera-button"> 
-          <span class="fa fa-video-camera">Toggle Detection</span>
-        </button>
-        <div id="publisher"></div>
-        <!-- TODO: maybe we don't need video-stream -->
-        <video id="video-stream"></video>
-        <canvas id="video-canvas" width="640" height="480"></canvas>
-      </div>
-    </div>
-
-    <div class="col l5 center full-height">
-      <div class="content">
-        <h3>Phone Stream</h3>
-        {{> paperStream}}
-      </div>
-    </div>
-
-    <div class="col l4 center center-vertical full-height paper-col">
-      <div class="content">
-        {{> taskSetter}}
-        <div class="message padding">
-          <h3>User messages</h3>
-          <div id="message-container"></div>
-        </div>
-        {{> map}}
-      </div>
-    </div>
   </div>
+
+  <table id="content-table">
+    <tbody>
+      <tr>
+        <td class="main-td">
+          <div id="publisher"></div>
+          <canvas id="video-canvas" width="0" height="0"></canvas>
+          <button id="camera-button">Enable TopCodes</button>
+        </td>
+        <td class="main-td">
+          <div id="paper-wrapper">
+            <div id="viewport">
+              <div id="paper">
+                <div id="center-text">
+                  <div id="stream-title-text">STREAM KEY:</div>
+                  <div id="stream-key-text">{{ sessionKey }}</div>
+              </div>
+
+              </div>
+            </div>
+          </div>
+        </td>
+        <td class="main-td">
+          <h6>User Messages</h6>
+          <div id="user-messages">
+            <div id="user-messages-internal">
+            </div>
+            </div>
+            <h6>User Location</h6>
+          <div id="map"></div>
+        </td>
+
+      </tr>
+    </tbody>
+  </table>
 
 </template>
