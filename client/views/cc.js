@@ -84,7 +84,7 @@ Template.cc.onRendered(function() {
         var properties = {
           width: 320,
           height: 240,
-          mirror: true
+          mirror: false
         };
         publisher = OT.initPublisher('publisher', properties);
         stream.publish(publisher);

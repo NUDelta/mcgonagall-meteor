@@ -14,6 +14,10 @@ html, body {
   white-space: nowrap;
 }
 
+#video-canvas{
+  display: none;
+}
+
 #ip-text {
   padding: 0px;
   padding-bottom: 40px;
