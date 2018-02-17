@@ -20,8 +20,8 @@ const codes = {
   photo : [93, 155, 203, 271],
   map : [157, 205, 279, 327],
   cameraOverlay : 331,
-  photoOverlay : 103,
-  mapOverlay : 47,
+  photoOverlay : 331,
+  mapOverlay : 331,
 }
 
 // msgs sent to iOS for elements that should be on-screen
