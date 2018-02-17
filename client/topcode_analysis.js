@@ -9,7 +9,7 @@ const IOS_FULL_HEIGHT = 667;
 const IOS_VIEW_HEIGHT = 603;
 const IOS_TOP_PADDING = 64;
 
-// The amount of frames without the topcode needed for the digital element to hide  
+// The amount of frames without the topcode needed for the digital element to hide
 const FRAME_BUFFER = 5;
 
 // topcodes corresponding to different elements
@@ -29,24 +29,24 @@ var states = {
   keyboard : false,
   camera : false,
   photo : false,
-  map : false, 
+  map : false,
   keyboardOverlay : false,
   cameraOverlay : false,
   photoOverlay : false,
-  mapOverlay: false, 
+  mapOverlay: false,
 }
 
-// buffer for each element 
+// buffer for each element
 // once a topcode was visible or not visible for 3 subsequent frames we can call the server method
 var buffer = {
   keyboard : 0,
   camera : 0,
   photo : 0,
-  map : 0, 
+  map : 0,
   keyboardOverlay : 0,
   cameraOverlay : 0,
   photoOverlay : 0,
-  mapOverlay: 0, 
+  mapOverlay: 0,
 }
 
 Template.cc.rendered = function videoSetup() {
@@ -74,12 +74,12 @@ TopCodes.setVideoFrameCallback("video-canvas", function(jsonString) {
     // just get the center of the code for now
     codeDict[topcode.code] = {
       x : topcode.x,
-      y : topcode.y, 
+      y : topcode.y,
       radius : topcode.radius
     }
   }
 
-  parseCodes(codeDict); 
+  parseCodes(codeDict);
 
 });
 
@@ -97,7 +97,7 @@ function parseCodes(codeDict) {
       states['keyboard'] = true;
     }
 
-  } else if (!(codes['keyboard'] in codeDict) && 
+  } else if (!(codes['keyboard'] in codeDict) &&
       states['keyboard']) {
 
     if (buffer['keyboard'] == FRAME_BUFFER) {
@@ -129,7 +129,7 @@ function parseCodes(codeDict) {
       screenshot(screenshotX, 0, screenshotWidth, VIDEO_HEIGHT, 0, 0, IOS_WIDTH, IOS_FULL_HEIGHT, "cameraOverlay", "true");
     }
 
-  } else if (!(codes['camera'] in codeDict) && 
+  } else if (!(codes['camera'] in codeDict) &&
       states['camera']) {
 
     if (buffer['camera'] == FRAME_BUFFER) {
@@ -212,7 +212,7 @@ function parseCodes(codeDict) {
     var width = x - (codeDict[codes['map'][1]].x - codeDict[codes['map'][1]].radius);
     var height = (codeDict[codes['map'][2]].y + codeDict[codes['map'][2]].radius) - y;
 
-    var iOSCoordinates = transformCoordinates([x, y, width, height]);  
+    var iOSCoordinates = transformCoordinates([x, y, width, height]);
 
     if (iOSCoordinates) {
       Meteor.call('map', session, iOSCoordinates[0], iOSCoordinates[1], iOSCoordinates[2], iOSCoordinates[3]);
@@ -256,7 +256,7 @@ function parseCodes(codeDict) {
   }
 
   // remove overlays w/o appr code regardless if native elements are on screen
-  if (!(codes['mapOverlay'] in codeDict) && 
+  if (!(codes['mapOverlay'] in codeDict) &&
       states['mapOverlay']) {
 
     if (buffer['mapOverlay'] == FRAME_BUFFER) {
@@ -269,7 +269,7 @@ function parseCodes(codeDict) {
 
   }
 
-  if (!(codes['photoOverlay'] in codeDict) && 
+  if (!(codes['photoOverlay'] in codeDict) &&
       states['photoOverlay']) {
 
     if (buffer['photoOverlay'] == FRAME_BUFFER) {
@@ -282,7 +282,7 @@ function parseCodes(codeDict) {
 
   }
 
-  if (!(codes['cameraOverlay'] in codeDict) && 
+  if (!(codes['cameraOverlay'] in codeDict) &&
       states['cameraOverlay']) {
 
     if (buffer['cameraOverlay'] == FRAME_BUFFER) {
