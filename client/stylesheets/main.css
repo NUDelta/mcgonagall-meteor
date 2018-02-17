@@ -4,22 +4,27 @@ html, body {
   margin: 0;
 }
 
-#nav {
-  padding: 0px;
-  margin: 0px;
-  background: rgb(78, 42, 132);
-}
-
 #title-text {
-  padding: 10px;
-  margin: 20px;
-  font-size: 28px;
+  padding-top: 30px;
+  font-size: 35px;
   font-weight: 600;
   font-family: -apple-system;
-  text-align: left;
-  color: white;
+  text-align: center;
+  color: black;
   white-space: nowrap;
 }
+
+#ip-text {
+  padding: 0px;
+  padding-bottom: 40px;
+  font-size: 25px;
+  font-weight: 400;
+  font-family: -apple-system;
+  text-align: center;
+  color: black;
+  white-space: nowrap;
+}
+
 
 #stream-key-text {
   font-size: 70px;
@@ -49,8 +54,6 @@ td, tr {
 
 #content-table {
   width: 100%;
-  border: 10px;
-  margin-top: 60px;
 }
 
 #user-data-table {
@@ -97,7 +100,7 @@ td, tr {
 h6 {
   padding: 0px;
   margin-top: 60px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   display: block;
   margin-left: auto;
   margin-right: auto;

@@ -6,6 +6,24 @@ Template.cc.onCreated(function() {
   this.subscribe('gestures', session);
   this.subscribe('keyboard', session);
   this.subscribe('locations', session);
+
+$("#ip-text").hide();
+// https://stackoverflow.com/questions/20194722/can-you-get-a-users-local-lan-ip-address-via-javascript
+  window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;//compatibility for Firefox and chrome
+  var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};
+  pc.createDataChannel('');//create a bogus data channel
+  pc.createOffer(pc.setLocalDescription.bind(pc), noop);// create offer and set local description
+  pc.onicecandidate = function(ice)
+  {
+   if (ice && ice.candidate && ice.candidate.candidate)
+   {
+    var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate)[1];
+    console.log('my IP: ', myIP);
+    $("#ip-text").text(myIP);
+    $("#ip-text").show();
+    pc.onicecandidate = noop;
+   }
+  };
 });
 
 Template.cc.onRendered(function() {
@@ -35,13 +53,15 @@ Template.cc.onRendered(function() {
   });
 
   let mapOptions = {
-      zoom: 18
+      zoom: 15
     },
     map = new google.maps.Map(document.getElementById('map'), mapOptions),
     marker = new google.maps.Marker({
       map: map
     });
 
+    let position = new google.maps.LatLng(37.33167558501772, -122.030189037323);
+    map.setCenter(position);
   Locations.find().observeChanges({
     added: function(id, fields) {
       let position = new google.maps.LatLng(fields.lat, fields.lng);
