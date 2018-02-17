@@ -4,7 +4,9 @@
   "repository": "https://github.com/NUDelta/rppt-web",
   "license": "MIT",
   "dependencies": {
-    "babel-runtime": "^6.23.0"
+    "@opentok/client": "^2.13.0",
+    "babel-runtime": "^6.23.0",
+    "opentok": "^2.6.1"
   },
   "scripts": {
     "build-dart": "cd imports/topcode-rppt && pub build && cd ../../"

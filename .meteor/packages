@@ -20,7 +20,6 @@ ejson@1.0.13
 spacebars
 check@1.2.5
 ecmascript@0.6.3
-aspin:tokbox
 dschulz:jquery-qrcode
 materialize:materialize
 standard-minifier-css

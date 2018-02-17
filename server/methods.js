@@ -1,155 +1,267 @@
 Meteor.methods({
-    // Web Methods
-    webCreateStream: function(session, role) {
-        let cred = {};
-        cred.stream = openTokClient.createSession();
-        cred.token = openTokClient.generateToken(cred.stream, { role });
-        cred.key = key;
-
-        console.log(`[webCreateStream]: Called as a ${role}. Creating stream.`);
-        console.log(`[webCreateStream]: Session: ${cred.stream}`);
-        console.log(`[webCreateStream]: Token: ${cred.token}`);
-        Streams.insert({ session, streamId: cred.stream, role });
-        return cred;
-    },
-
-    cleanUpStreams: function(session) {
-        Streams.remove({ session: session });
-    },
-
-    // Mobile Methods
-    getStreamData: function(session, role) {
-        let rerole = invertRole(role),
-        stream = Streams.findOne({ session, role: rerole }),
-        cred = {};
-        try {
-            cred.session = stream.streamId;
-            cred.token = openTokClient.generateToken(stream.streamId, { role: role });
-            cred.key = key;
-
-            console.log(`[getSession]: Called as a ${role}. Returning data.`);
-            console.log(`[getSession]: Session: ${cred.session}`);
-            console.log(`[getSession]: Token: ${cred.token}`);
-            console.log(`[getSession]: Key: ${cred.key}`);
-            return cred;
-        } catch (exception) {
-            throw new Meteor.Error(exception.error, exception.reason);
+  // Web Methods
+  webCreateStream: function(session, role) {
+    
+    var createSessionAsync = function(callback) {
+      openTokClient.createSession({}, function(error, session) {
+        if (error) {
+          console.log("Error creating session:", error)
+        } else {
+          callback(null, session)
         }
-    },
+      })
+    }
 
-    // Gesture Handling
-    createTap: function(session, x, y) {
-        let tapAction = { session: session, done: false, action: 'tap', x: x, y: y };
-        Gestures.insert(tapAction);
-    },
+    var syncCreateSession = Meteor.wrapAsync(createSessionAsync);
+    var session = syncCreateSession();
 
-    clearGestures: function(session) {
-        Gestures.remove({ session: session });
-    },
+    let cred = {};
+    cred.stream = session.sessionId;
+    cred.token = openTokClient.generateToken(cred.stream, {
+      role
+    });
+    cred.key = key;
 
-    clearSession: function(session) {
-        Gestures.remove({ session: session });
-        Messages.remove({ session: session });
-        Locations.remove({ session: session });
-        Streams.remove({ session: session });
-        Keyboard.remove({ session: session });
-    },
+    console.log(`[webCreateStream]: Called as a ${role}. Creating stream.`);
+    console.log(`[webCreateStream]: Session: ${cred.stream}`);
+    console.log(`[webCreateStream]: Token: ${cred.token}`);
 
-    // Task Handling
-    createTaskEntry: function(session) {
-        Messages.remove({ session: session });
-        Messages.insert({ session: session, type: 'task', content: 'Waiting for your first task...'});
-    },
+    Streams.insert({
+      session,
+      streamId: cred.stream,
+      role
+    });
 
-    getTaskId: function(session) {
-        return Messages.findOne({ session: session });
-    },
+    return cred;
 
-    updateTask: function(session, task) {
-        Messages.update({ session: session }, { $set: { content: task } });
-    },
+  },
 
-    // mixed fidelity element control
-    keyboard: function(session, x, y, width, height) {
-        console.log('keyboard called in methods.js');
-        Messages.update({ session: session }, { $set: { keyboard_x: x,
-                                                        keyboard_y: y,
-                                                        keyboard_height: height,
-                                                        keyboard_width: width } });
-    },
+  cleanUpStreams: function(session) {
+    Streams.remove({
+      session: session
+    });
+  },
 
-    photo: function(session, x, y, width, height) {
-        console.log('called photo in methods.js');
-        x = String(x);
-        y = String(y);
-        height = String(height);
-        width = String(width);
+  // Mobile Methods
+  getStreamData: function(session, role) {
+    let rerole = invertRole(role),
+      stream = Streams.findOne({
+        session,
+        role: rerole
+      }),
+      cred = {};
+    try {
+      cred.session = stream.streamId;
+      cred.token = openTokClient.generateToken(stream.streamId, {
+        role: role
+      });
+      cred.key = key;
 
-        Messages.update({ session: session }, { $set: { photo_x:  x,
-                                                        photo_y: y,
-                                                        photo_height: height,
-                                                        photo_width: width} });
-    },
+      console.log(`[getSession]: Called as a ${role}. Returning data.`);
+      console.log(`[getSession]: Session: ${cred.session}`);
+      console.log(`[getSession]: Token: ${cred.token}`);
+      console.log(`[getSession]: Key: ${cred.key}`);
+      return cred;
+    } catch (exception) {
+      throw new Meteor.Error(exception.error, exception.reason);
+    }
+  },
 
-    map: function(session, x, y, width, height) {
-        x = String(x);
-        y = String(y);
-        height = String(height);
-        width = String(width);
+  // Gesture Handling
+  createTap: function(session, x, y) {
+    let tapAction = {
+      session: session,
+      done: false,
+      action: 'tap',
+      x: x,
+      y: y
+    };
+    Gestures.insert(tapAction);
+  },
 
-        Messages.update({ session: session }, { $set: { map_x:  x,
-                                                        map_y: y,
-                                                        map_height: height,
-                                                        map_width: width} });
-    },
+  clearGestures: function(session) {
+    Gestures.remove({
+      session: session
+    });
+  },
 
-    showCamera: function(session) {
-        Messages.update({ session: session }, { $set: { camera: 'show'} });
-    },
+  clearSession: function(session) {
+    Gestures.remove({
+      session: session
+    });
+    Messages.remove({
+      session: session
+    });
+    Locations.remove({
+      session: session
+    });
+    Streams.remove({
+      session: session
+    });
+    Keyboard.remove({
+      session: session
+    });
+  },
 
-    hideCamera: function(session) {
-        Messages.update({ session: session }, { $set: { camera: 'hide' } });
-    },
+  // Task Handling
+  createTaskEntry: function(session) {
+    Messages.remove({
+      session: session
+    });
+    Messages.insert({
+      session: session,
+      type: 'task',
+      content: 'Waiting for your first task...'
+    });
+  },
 
-    printKeyboardMessage: function(session, text) {
-        let newMessage = { session: session, text: text };
-        Keyboard.insert(newMessage);
-    },
+  getTaskId: function(session) {
+    return Messages.findOne({
+      session: session
+    });
+  },
 
-    clearMessages: function(session, text) {
-        Keyboard.remove({ session: session });
-    },
+  updateTask: function(session, task) {
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        content: task
+      }
+    });
+  },
 
-    showKeyboard: function(session) {
-        console.log("Calling `showKeyboard`");
-        Messages.update({ session: session }, { $set: { keyboard: 'show'} });
-    },
+  // mixed fidelity element control
+  keyboard: function(session, x, y, width, height) {
+    console.log('keyboard called in methods.js');
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        keyboard_x: x,
+        keyboard_y: y,
+        keyboard_height: height,
+        keyboard_width: width
+      }
+    });
+  },
 
-    hideKeyboard: function(session) {
-        console.log("Calling `hideKeyboard`");
-        Messages.update({ session: session }, { $set: { keyboard: 'hide' } });
-    },
+  photo: function(session, x, y, width, height) {
+    console.log('called photo in methods.js');
+    x = String(x);
+    y = String(y);
+    height = String(height);
+    width = String(width);
 
-    sendOverlay: function(session, x, y, width, height, image, isCameraOverlay) {
-      const data = {
-        overlayedImage_x: x.toString(),
-        overlayedImage_y: y.toString(),
-        overlayedImage_height: height.toString(),
-        overlayedImage_width: width.toString(),
-        overlayedImage: image,
-        isCameraOverlay: isCameraOverlay,
-      };
-      console.log("sending overlay");
-      Messages.update({ session: session }, { $set: data });
-    },
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        photo_x: x,
+        photo_y: y,
+        photo_height: height,
+        photo_width: width
+      }
+    });
+  },
+
+  map: function(session, x, y, width, height) {
+    x = String(x);
+    y = String(y);
+    height = String(height);
+    width = String(width);
+
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        map_x: x,
+        map_y: y,
+        map_height: height,
+        map_width: width
+      }
+    });
+  },
+
+  showCamera: function(session) {
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        camera: 'show'
+      }
+    });
+  },
+
+  hideCamera: function(session) {
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        camera: 'hide'
+      }
+    });
+  },
+
+  printKeyboardMessage: function(session, text) {
+    let newMessage = {
+      session: session,
+      text: text
+    };
+    Keyboard.insert(newMessage);
+  },
+
+  clearMessages: function(session, text) {
+    Keyboard.remove({
+      session: session
+    });
+  },
+
+  showKeyboard: function(session) {
+    console.log("Calling `showKeyboard`");
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        keyboard: 'show'
+      }
+    });
+  },
+
+  hideKeyboard: function(session) {
+    console.log("Calling `hideKeyboard`");
+    Messages.update({
+      session: session
+    }, {
+      $set: {
+        keyboard: 'hide'
+      }
+    });
+  },
+
+  sendOverlay: function(session, x, y, width, height, image, isCameraOverlay) {
+    const data = {
+      overlayedImage_x: x.toString(),
+      overlayedImage_y: y.toString(),
+      overlayedImage_height: height.toString(),
+      overlayedImage_width: width.toString(),
+      overlayedImage: image,
+      isCameraOverlay: isCameraOverlay,
+    };
+    console.log("sending overlay");
+    Messages.update({
+      session: session
+    }, {
+      $set: data
+    });
+  },
 
 });
 
 function invertRole(role) {
-    if (role == 'publisher') {
-        return 'subscriber';
-    }
-    else {
-        return 'publisher';
-    }
+  if (role == 'publisher') {
+    return 'subscriber';
+  } else {
+    return 'publisher';
+  }
 }
