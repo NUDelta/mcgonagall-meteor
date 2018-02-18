@@ -1,6 +1,5 @@
 <template name="cc">
   <div id="title-text">McGonagall Command Center</div>
-  <div id="ip-text">0.0.0.0</div>
 
   <table id="content-table">
     <tbody>
@@ -14,11 +13,13 @@
           <div id="paper-wrapper">
             <div id="viewport">
               <div id="paper">
-                <div id="center-text">
-                  <div id="stream-title-text">STREAM KEY:</div>
-                  <div id="stream-key-text">{{ sessionKey }}</div>
-              </div>
-
+                <table id="qr-table">
+                  <tr>
+                    <td style="text-align: center;">
+                      <img id="qrcode-image" src=""/>
+                    </td>
+                    </tr>
+                    </table>
               </div>
             </div>
           </div>

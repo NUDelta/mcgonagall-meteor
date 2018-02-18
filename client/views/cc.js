@@ -7,22 +7,35 @@ Template.cc.onCreated(function() {
   this.subscribe('keyboard', session);
   this.subscribe('locations', session);
 
-$("#ip-text").hide();
-// https://stackoverflow.com/questions/20194722/can-you-get-a-users-local-lan-ip-address-via-javascript
-  window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;//compatibility for Firefox and chrome
-  var pc = new RTCPeerConnection({iceServers:[]}), noop = function(){};
-  pc.createDataChannel('');//create a bogus data channel
-  pc.createOffer(pc.setLocalDescription.bind(pc), noop);// create offer and set local description
-  pc.onicecandidate = function(ice)
-  {
-   if (ice && ice.candidate && ice.candidate.candidate)
-   {
-    var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate)[1];
-    console.log('my IP: ', myIP);
-    $("#ip-text").text(myIP);
-    $("#ip-text").show();
-    pc.onicecandidate = noop;
-   }
+
+  // https://stackoverflow.com/questions/20194722/can-you-get-a-users-local-lan-ip-address-via-javascript
+  window.RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection; //compatibility for Firefox and chrome
+  var pc = new RTCPeerConnection({
+      iceServers: []
+    }),
+    noop = function() {};
+  pc.createDataChannel(''); //create a bogus data channel
+  pc.createOffer(pc.setLocalDescription.bind(pc), noop); // create offer and set local description
+  pc.onicecandidate = function(ice) {
+    if (ice && ice.candidate && ice.candidate.candidate) {
+      var myIP = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate)[1];
+      console.log('my IP: ', myIP);
+      pc.onicecandidate = noop;
+
+      var QRCode = require('qrcode')
+
+      var url;
+      if (Meteor.isDevelopment) {
+        url = "ws://" + myIP + ":3000/websocket?" + session;
+      } else {
+        url = "ws://rppt.meteorapp.com/websocket?" + session;
+      }
+
+      console.log(url);
+      QRCode.toDataURL(url, function(err, url) {
+        document.getElementById('qrcode-image').src = url
+      })
+    }
   };
 });
 
@@ -60,8 +73,8 @@ Template.cc.onRendered(function() {
       map: map
     });
 
-    let position = new google.maps.LatLng(37.33167558501772, -122.030189037323);
-    map.setCenter(position);
+  let position = new google.maps.LatLng(37.33167558501772, -122.030189037323);
+  map.setCenter(position);
   Locations.find().observeChanges({
     added: function(id, fields) {
       let position = new google.maps.LatLng(fields.lat, fields.lng);

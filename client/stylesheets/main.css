@@ -6,6 +6,7 @@ html, body {
 
 #title-text {
   padding-top: 30px;
+  padding-bottom: 40px;
   font-size: 35px;
   font-weight: 600;
   font-family: -apple-system;
@@ -18,34 +19,10 @@ html, body {
   display: none;
 }
 
-#ip-text {
-  padding: 0px;
-  padding-bottom: 40px;
-  font-size: 25px;
-  font-weight: 400;
-  font-family: -apple-system;
-  text-align: center;
-  color: black;
-  white-space: nowrap;
-}
-
-
-#stream-key-text {
-  font-size: 70px;
-  font-weight: 700;
-  font-family: -apple-system;
-  text-align: center;
-  color: black;
-}
-
-#stream-title-text {
+#qr-table {
   margin-top: 100px;
-  font-size: 30px;
-  font-weight: 600;
-  font-family: -apple-system;
-  text-align: center;
-  color: rgb(80,80,80);
 }
+
 
 td, tr {
   padding: 0px;
